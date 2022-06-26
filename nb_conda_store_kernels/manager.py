@@ -61,22 +61,19 @@ class CondaStoreKernelSpecManager(KernelSpecManager):
                 namespace=namespace,
                 name=name,
                 build=build)
-            uri = f"{namespace}/{name}:{build}"
-            kernel_specs[uri] = KernelSpec(
+            kernel_specs[f"conda-store://{namespace}/{name}:{build}"] = KernelSpec(
                 display_name=display_name,
                 argv=['conda-store', 'run', str(build), "--", "python", "-m", "IPython", "kernel", "-f", "{connection_file}"],
-                metadata={
-                    'conda-store': uri,
-                    'resource_dir': os.path.join(
-                        tempfile.gettempdir(), "conda-store", str(build),
-                    )
-                }
+                language="python",
+                resource_dir=os.path.join(
+                    tempfile.gettempdir(), "conda-store", str(build),
+                ),
             )
         return kernel_specs
 
     def find_kernel_specs(self):
         kernel_specs = run_sync(self._kernel_specs)()
-        return {name: spec.metadata['resource_dir'] for name, spec in kernel_specs.items()}
+        return {name: spec.resource_dir for name, spec in kernel_specs.items()}
 
     def get_kernel_spec(self, kernel_name):
         kernel_specs = run_sync(self._kernel_specs)()
@@ -84,7 +81,7 @@ class CondaStoreKernelSpecManager(KernelSpecManager):
 
     def get_all_specs(self):
         kernel_specs = run_sync(self._kernel_specs)()
-        return {name: {'resource_dir': spec.metadata['resource_dir'], 'spec': spec.to_dict()} for name, spec in kernel_specs.items()}
+        return {name: {'resource_dir': spec.resource_dir, 'spec': spec.to_dict()} for name, spec in kernel_specs.items()}
 
     def remove_kernel_spec(self, name):
         pass
