@@ -26,8 +26,8 @@ jobs:
       - name: Black Formatting
         run: |
           black --version
-          black conda_store_server --diff
-          black --check conda_store_server
+          black nb_conda_store_kernels --diff
+          black --check nb_conda_store_kernels
       - name: Flake8 Formatting
         run: |
           flake8 --version
