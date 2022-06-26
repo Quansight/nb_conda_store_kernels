@@ -44,6 +44,10 @@ class CondaStoreKernelSpecManager(KernelSpecManager):
 
         self.log.info("[nb_conda_store_kernels] enabled")
 
+    @property
+    def kernel_specs(self):
+        return run_sync(self._kernel_specs)()
+
     async def _kernel_specs(self):
         async with api.CondaStoreAPI(
                 conda_store_url=self.conda_store_url,
@@ -68,20 +72,18 @@ class CondaStoreKernelSpecManager(KernelSpecManager):
                 resource_dir=os.path.join(
                     tempfile.gettempdir(), "conda-store", str(build),
                 ),
+                metadata={},
             )
         return kernel_specs
 
     def find_kernel_specs(self):
-        kernel_specs = run_sync(self._kernel_specs)()
-        return {name: spec.resource_dir for name, spec in kernel_specs.items()}
+        return {name: spec.resource_dir for name, spec in self.kernel_specs.items()}
 
     def get_kernel_spec(self, kernel_name):
-        kernel_specs = run_sync(self._kernel_specs)()
-        return kernel_specs[kernel_name]
+        return self.kernel_specs[kernel_name]
 
     def get_all_specs(self):
-        kernel_specs = run_sync(self._kernel_specs)()
-        return {name: {'resource_dir': spec.resource_dir, 'spec': spec.to_dict()} for name, spec in kernel_specs.items()}
+        return {name: {'resource_dir': spec.resource_dir, 'spec': spec.to_dict()} for name, spec in self.kernel_specs.items()}
 
     def remove_kernel_spec(self, name):
         pass
