@@ -1,8 +1,10 @@
 import sys
 
 
-def execute_tarball(namespace : str, name : str, connection_file : str):
-    print(f'[CondaStoreKernels] Executing {namespace}/{name} with file: {connection_file}')
+def execute_tarball(namespace: str, name: str, connection_file: str):
+    print(
+        f"[CondaStoreKernels] Executing {namespace}/{name} with file: {connection_file}"
+    )
 
 
 if __name__ == "__main__":
