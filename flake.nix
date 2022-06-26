@@ -19,6 +19,7 @@
               propagatedBuildInputs = [
                 pythonPackages.jupyter-client
                 pythonPackages.traitlets
+                pythonPackages.requests
               ];
             };
         in
@@ -27,6 +28,14 @@
             buildInputs = [
               nb_conda_store_kernels
               pythonPackages.jupyterlab
+
+              pythonPackages.pytest
+              pythonPackages.black
+              pythonPackages.flake8
+              pythonPackages.build
+              pythonPackages.setuptools
+
+              pkgs.docker-compose
             ];
           };
         }

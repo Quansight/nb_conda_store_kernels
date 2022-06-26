@@ -1,0 +1,8 @@
+name: nb_conda_store_kernels
+channels:
+  - conda-forge
+dependencies:
+  - jupyterlab
+  - conda-store >=0.4.4
+  - traitlets
+  - jupyter_client
