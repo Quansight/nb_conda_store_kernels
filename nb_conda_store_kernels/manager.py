@@ -13,15 +13,19 @@ class CondaStoreKernelSpecManager(KernelSpecManager):
     """
 
     conda_store_url = Unicode(
-        "http://localhost:5000/",
+        os.environ.get("CONDA_STORE_URL", "http://localhost:5000/"),
         help="Base prefix URL for connecting to conda-store cluster",
         config=True,
     )
 
-    conda_store_verify_ssl = Bool(True, help="Verify all TLS connections", config=True)
+    conda_store_verify_ssl = Bool(
+        "CONDA_STORE_NO_VERIFY" not in os.environ,
+        help="Verify all TLS connections",
+        config=True
+    )
 
     conda_store_auth = Unicode(
-        "none",
+        os.environ.get("CONDA_STORE_AUTH", "none"),
         help="Authentication type to use with Conda-Store. Available options are none, token, and basic",
         config=True,
     )
