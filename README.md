@@ -1,30 +1,84 @@
 # nb_conda_store_kernels
 
-## Usage
+This extension enables a Jupyter Notebook or JupyterLab application to access environments stored in Conda-Store and run kernels for Python, R, and other languages. When a kernel from an external environment is selected, the environment is downloaded, extracted, conda environment is automatically activated, and finally the kernel is launched. This package was heavily inspired by [nb_conda_kernels](https://github.com/Anaconda-Platform/nb_conda_kernels).
 
-Modify the jupyter configuration to enable `nb_conda_store_kernels` as
-a kernel manager in `jupyter_config.py`. Several of the settings can
-be configured via traitlets. However several will need to be set via
-environment variables. 
+Any notebook launched via a `nb_conda_store_kernel` kernel will have
+notebook metadata about the environment used. This provides a powerful
+mechanism for running the notebook later in a reproducible way.
 
-```python
-c.JupyterApp.kernel_spec_manager_class = "nb_conda_store_kernels.manager.CondaStoreKernelSpecManager"
-c.CondaStoreKernelSpecManager.conda_store_url = "http://conda-store-server:5000/conda-store"
-c.CondaStoreKernelSpecManager.conda_store_auth = "basic"
+```
+{
+    ...,
+    "kernelspec": {
+        ...,
+        "name": "conda-store://<namespace>/<environment_name>:<build-id>",
+        ...,
+    },
+    ...
+}
 ```
 
-Environment variables which correspond to the environment variables
-that [conda-store](https://github.com/quansight/conda-store) uses:
- - `CONDA_STORE_URL`
- - `CONDA_STORE_AUTH`
- - `CONDA_STORE_NO_VERIFY_SSL`
- - `CONDA_STORE_USERNAME`
- - `CONDA_STORE_PASSWORD`
- - `CONDA_STORE_TOKEN`
+The package works by defining a custom KernelSpecManager that calls the Conda-Store REST API for available conda environments with required packages. It dynamically modifies each KernelSpec so that it can be properly run from the notebook environment. When you create a new notebook, these modified kernels will be made available in the selection list. Additionally without [Conda-Pack](https://conda.github.io/conda-pack/)
 
-This package is heavily under development and much may change. If
-configured properly environment should show up in ~10 second delays
-from changes in the Conda-Store server.
+## Usage
+
+This package does not need `pip` or `conda` to run properly but
+currently only run on Linux. It should be installed in the environment
+from which you run Jupyter Notebook or JupyterLab. It is recommended
+for install `nb_conda_store_kernsl` via Conda due to activation hooks
+which simplify the installation but there is no strong reason to use
+conda.
+
+```shell
+conda install -c conda-forge nb_conda_store_kernels
+```
+
+Alternatively `pip` works as well but requires one additional step.
+
+```shell
+pip install nb_conda_store_kernels
+python -m nb_conda_store_kernels.install --enable
+```
+
+`python -m nb_conda_store_kernels.install --enable` simply modifies a
+single jupyter setting. If that did not work (it should and is a bug
+if not) you need to add the following setting to `jupyter_config.py`.
+
+```shell
+mkdir ~/.jupyter
+echo 'c.JupyterApp.kernel_spec_manager_class = "nb_conda_store_kernels.manager.CondaStoreKernelSpecManager"' > ~/.jupyter/jupyter_conifg.py
+```
+
+In order to `nb_conda_store_kernels` to connect properly to
+Conda-Store it needs several environment variables set. Under the
+covers `conda-store` the client is being using and has [detailed
+documentation](https://github.com/quansight/conda-store/conda-store)
+on configuration.
+
+```
+export CONDA_STORE_URL=http(s)://...
+export CONDA_STORE_AUTH=none|basic|token
+# export CONDA_STORE_USERNAME=... # using basic auth 
+# export CONDA_STORE_PASSWORD=... # using basic auth
+# export CONDA_STORE_TOKEN=...    # using token auth
+```
+
+Finally launch JupyterLab!
+
+```shell
+jupyter lab
+```
+
+### Use with nbconvert, voila, papermill,...
+
+Since `nb_conda_store_kernels` uses the `conda-store` client under the
+covers these use cases are supported by the client with proper
+environment variables being set. There are plans to extend other tools
+to use Conda-Store.
+
+```shell
+conda-store run namespace/environment -- python -c "print('Hello, Conda-Store!')"
+```
 
 ## Development
 
@@ -32,8 +86,6 @@ Start Conda-Store server
 
 ```
 docker-compose up --build
-nix develop
-python -m nb_conda_store_kernels.install
 jupyter lab
 ```
 
