@@ -21,7 +21,7 @@ class CondaStoreKernelSpecManager(KernelSpecManager):
     conda_store_verify_ssl = Bool(
         "CONDA_STORE_NO_VERIFY" not in os.environ,
         help="Verify all TLS connections",
-        config=True
+        config=True,
     )
 
     conda_store_auth = Unicode(
