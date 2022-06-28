@@ -38,6 +38,7 @@ Alternatively `pip` works as well but requires one additional step.
 ```shell
 pip install nb_conda_store_kernels
 python -m nb_conda_store_kernels.install --enable
+# python -m nb_conda_store_kernels.install --disable # to disable
 ```
 
 `python -m nb_conda_store_kernels.install --enable` simply modifies a
