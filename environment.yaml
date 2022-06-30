@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - jupyterlab
-  - conda-store >=0.4.4
+  - conda-store >=0.4.5
   - traitlets
   - jupyter_client
   - jlab-enhanced-launcher

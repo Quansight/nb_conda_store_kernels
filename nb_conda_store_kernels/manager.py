@@ -55,7 +55,11 @@ class CondaStoreKernelSpecManager(KernelSpecManager):
             auth=self.conda_store_auth,
             verify_ssl=self.conda_store_verify_ssl,
         ) as conda_store_api:
-            environments = await conda_store_api.list_environments()
+            environments = await conda_store_api.list_environments(
+                status="COMPLETED",
+                artifact="CONDA_PACK",
+                packages=["ipykernel"],
+            )
 
         kernel_specs = {}
         for environment in environments:
