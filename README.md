@@ -72,8 +72,11 @@ jupyter lab
 
 ### Connecting to existing conda-store server
 
+Visit conda-store server you are using and get a token for your given
+user via vising the `/user` endpoint after you login.
+
 ```shell
-docker run -it -e CONDA_STORE_AUTH=token -e CONDA_STORE_URL=https://conda.store -e CONDA_STORE_TOKEN=... quansight/nb-conda-store-kernels
+docker run -p 8888:8888 -e CONDA_STORE_TOKEN=... quansight/nb-conda-store-kernels:v0.1.5
 ```
 
 ### Use with nbconvert, voila, papermill,...

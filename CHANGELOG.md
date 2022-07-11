@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.1.5] - 2022-07-11
+
+### Added
+
+ - Default non-conda-store environments how are available
+
 ## [0.1.4] - 2022-06-29
 
 ### Added
