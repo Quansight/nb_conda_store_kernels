@@ -26,3 +26,46 @@ jobs:
         run: |
           python -m build --sdist
           twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD dist/*
+
+  docker:
+    name: 'Build Docker Release Images'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Infrastructure'
+        uses: actions/checkout@master
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Lint Dockerfiles
+        uses: jbergstroem/hadolint-gh-action@v1
+        with:
+          dockerfile: Dockerfile
+          output_format: tty
+          error_level: 0
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker Meta
+        id: meta
+        uses: crazy-max/ghaction-docker-meta@v2
+        with:
+          images: |
+            quansight/nb-conda-store-kernels
+          tags: |
+            type=ref,event=tag
+
+      - name: Build docker
+        uses: docker/build-push-action@v2
+        with:
+          file: "Dockerfile"
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+          push: ${{ github.event_name != 'pull_request' }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -11,9 +11,18 @@ COPY . /opt/nb_conda_store_kernels/
 RUN cd /opt/nb_conda_store_kernels && \
     pip install -e .
 
-RUN mkdir -p /home/jovyan && \
-    mkdir -p /home/jovyan/.jupyter && \
-    cp /opt/nb_conda_store_kernels/tests/assets/jupyter_config.py /home/jovyan/.jupyter/jupyter_config.py && \
-    chown -R 1000:1000 /home/jovyan
+ARG UID=1000
+ARG GID=1000
+ARG USER=jovyan
 
-WORKDIR /home/jovyan
+RUN useradd -l -m -s /bin/bash -N -u "${UID}" "${USER}" && \
+    mkdir -p /home/jovyan/.jupyter && \
+    cp /opt/nb_conda_store_kernels/tests/assets/jupyter_config.py /home/jovyan/.jupyter/jupyter_config.py
+
+WORKDIR /home/${USER}
+USER ${UID}
+
+ENV CONDA_STORE_AUTH=token
+ENV CONDA_STORE_URL=https://conda.store
+
+CMD ["jupyter", "lab", "--ip=0.0.0.0"]

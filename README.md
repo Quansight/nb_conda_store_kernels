@@ -70,6 +70,12 @@ Finally launch JupyterLab!
 jupyter lab
 ```
 
+### Connecting to existing conda-store server
+
+```shell
+docker run -it -e CONDA_STORE_AUTH=token -e CONDA_STORE_URL=https://conda.store -e CONDA_STORE_TOKEN=... quansight/nb-conda-store-kernels
+```
+
 ### Use with nbconvert, voila, papermill,...
 
 Since `nb_conda_store_kernels` uses the `conda-store` client under the
