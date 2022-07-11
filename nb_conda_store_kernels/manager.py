@@ -1,7 +1,7 @@
 import tempfile
 import os
 
-from jupyter_client.kernelspec import KernelSpecManager, KernelSpec
+from jupyter_client.kernelspec import KernelSpecManager, KernelSpec, NoSuchKernel
 from jupyter_client.utils import run_sync
 from traitlets import Bool, Unicode
 from conda_store import api
@@ -38,6 +38,12 @@ class CondaStoreKernelSpecManager(KernelSpecManager):
         '{name}' = Environment name
         '{build}' = Build Id for particular environment
         """,
+    )
+
+    conda_store_only = Bool(
+        False,
+        config=True,
+        help="Whether to include only the conda-store kernels not visible from Jupyter normally or not",
     )
 
     def __init__(self, **kwargs):
@@ -95,16 +101,30 @@ class CondaStoreKernelSpecManager(KernelSpecManager):
         return kernel_specs
 
     def find_kernel_specs(self):
-        return {name: spec.resource_dir for name, spec in self.kernel_specs.items()}
+        if self.conda_store_only:
+            kernel_specs = {}
+        else:
+            kernel_specs = super().find_kernel_specs()
+        kernel_specs.update(
+            {name: spec.resource_dir for name, spec in self.kernel_specs.items()}
+        )
+        return kernel_specs
 
     def get_kernel_spec(self, kernel_name):
-        return self.kernel_specs[kernel_name]
+        result = self.kernel_specs.get(kernel_name)
+        if result is None and not self.conda_store_only:
+            result = super().get_kernel_spec(kernel_name)
+        return result
 
     def get_all_specs(self):
-        return {
-            name: {"resource_dir": spec.resource_dir, "spec": spec.to_dict()}
-            for name, spec in self.kernel_specs.items()
-        }
+        result = {}
+        for name, resource_dir in self.find_kernel_specs().items():
+            try:
+                spec = self.get_kernel_spec(name)
+                result[name] = {"resource_dir": resource_dir, "spec": spec.to_dict()}
+            except NoSuchKernel:
+                self.log.warning("Error loading kernelspec %r", name, exc_info=True)
+        return result
 
     def remove_kernel_spec(self, name):
         pass

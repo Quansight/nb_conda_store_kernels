@@ -6,4 +6,4 @@ dependencies:
   - conda-store >=0.4.5
   - traitlets
   - jupyter_client
-  - jlab-enhanced-launcher
+  # - jlab-enhanced-launcher
