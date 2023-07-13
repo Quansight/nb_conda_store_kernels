@@ -58,7 +58,7 @@ class CondaStoreKernelSpecManager(KernelSpecManager):
     async def _kernel_specs(self):
         async with api.CondaStoreAPI(
             conda_store_url=self.conda_store_url,
-            auth=self.conda_store_auth,
+            auth_type=self.conda_store_auth,
             verify_ssl=self.conda_store_verify_ssl,
         ) as conda_store_api:
             environments = await conda_store_api.list_environments(
